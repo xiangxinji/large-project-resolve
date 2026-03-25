@@ -1,9 +1,12 @@
 {
-  "test.css": [
-    "base.css"
-  ],
-  "b.css": [],
-  "a.css": [
-    "./b.css"
+  "test.html": [
+    "js/app.js",
+    "https://cdn.example.com/jquery.js",
+    "./utils/helper.js",
+    "styles/main.css",
+    "https://cdn.example.com/bootstrap.css",
+    "favicon.ico",
+    "images/logo.png",
+    "about.html"
   ]
 }

@@ -23,6 +23,21 @@ export const QUERIES: QueryConfig = {
     (import_declaration (scoped_identifier) @dep)
     (import_declaration (identifier) @dep)
   `,
+  html: `
+    ; 匹配所有 src 属性值（用于 script、img 等）
+    (attribute
+      (attribute_name) @attr.name
+      (quoted_attribute_value
+        (attribute_value) @dep))
+      (#eq? @attr.name "src")
+
+    ; 匹配所有 href 属性值（用于 link、a 等）
+    (attribute
+      (attribute_name) @attr.name
+      (quoted_attribute_value
+        (attribute_value) @dep))
+      (#eq? @attr.name "href")
+  `,
   css: `
     ; 匹配 @import 语句中的字符串
     (import_statement
@@ -50,6 +65,7 @@ export const WASM_FILES: WasmFileConfig = {
   js: 'tree-sitter-javascript.wasm',
   ts: 'tree-sitter-typescript-typescript.wasm',
   java: 'tree-sitter-java.wasm',
+  html: 'tree-sitter-html.wasm',
   css: 'tree-sitter-css.wasm',
   scss: 'tree-sitter-css.wasm',  // SCSS 使用 CSS 解析器
   less: 'tree-sitter-css.wasm'   // LESS 使用 CSS 解析器

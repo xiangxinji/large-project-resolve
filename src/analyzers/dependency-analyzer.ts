@@ -4,6 +4,7 @@ import { globSync } from 'glob';
 import { FileProcessorFactory } from '../processors/processor-factory';
 import { ParserManager } from '../parsers/parser-manager';
 import { ScanOptions, DEFAULT_SCAN_OPTIONS, buildIgnorePatterns, shouldIgnorePath } from '../constants/scan-options';
+import { Framework, frameworkToScanOptions, getFrameworkConfig } from '../constants/framework-config';
 
 /**
  * 扫描统计信息
@@ -25,17 +26,40 @@ export class SmartDependencyAnalyzer {
   private parserManager: ParserManager;
   private scanOptions: ScanOptions;
   private statistics: ScanStatistics;
+  private framework?: Framework;
 
   constructor(
-    parserPath?: string,
-    scanOptions: ScanOptions = {}
+    {
+      parserPath,
+      scanOptions
+    }: {
+      parserPath?: string,
+      scanOptions: ScanOptions
+    }
   ) {
+    // 提取框架类型
+    this.framework = scanOptions.framework;
+
     // 如果没有提供路径，则自动检测 WASM 文件位置
     const defaultParserPath = parserPath || this.detectParserPath();
 
-    this.factory = new FileProcessorFactory();
+    // 根据框架创建对应的处理器工厂
+    this.factory = new FileProcessorFactory(this.framework);
     this.parserManager = new ParserManager(defaultParserPath);
-    this.scanOptions = { ...DEFAULT_SCAN_OPTIONS, ...scanOptions };
+
+    // 如果指定了框架，使用框架配置合并扫描选项
+    if (this.framework) {
+      const frameworkOptions = frameworkToScanOptions(this.framework);
+      this.scanOptions = {
+        ...frameworkOptions,
+        ...scanOptions,
+        // 确保框架设置不被覆盖
+        framework: this.framework
+      };
+    } else {
+      this.scanOptions = { ...DEFAULT_SCAN_OPTIONS, ...scanOptions };
+    }
+
     this.statistics = {
       totalFilesScanned: 0,
       filesSkipped: 0,
@@ -43,6 +67,12 @@ export class SmartDependencyAnalyzer {
       directoriesScanned: 0,
       errors: 0
     };
+
+    // 如果指定了框架，打印框架信息
+    if (this.framework) {
+      const config = getFrameworkConfig(this.framework);
+      console.log(`🎯 Framework: ${config.name} - ${config.description}`);
+    }
   }
 
   /**
@@ -177,7 +207,10 @@ export class SmartDependencyAnalyzer {
 
     // 构建文件扩展名模式
     const extensions = this.scanOptions.extensions || DEFAULT_SCAN_OPTIONS.extensions || [];
-    const extensionPattern = `**/*.{${extensions.join(',')}}`;
+    // 对于单个扩展名，使用 *.ext 格式；对于多个扩展名，使用 *.{ext1,ext2} 格式
+    const extensionPattern = extensions.length === 1
+      ? `**/*.${extensions[0]}`
+      : `**/*.{${extensions.join(',')}}`;
 
     // 构建忽略模式
     const ignorePatterns = buildIgnorePatterns(this.scanOptions);

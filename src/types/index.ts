@@ -1,4 +1,5 @@
 import { Parser, Query, Language } from 'web-tree-sitter';
+import { Framework } from '../constants/framework-config';
 
 /**
  * 解析器配置接口
@@ -34,3 +35,8 @@ export interface AnalysisResult {
 export interface WasmFileConfig {
   [key: string]: string;
 }
+
+/**
+ * 导出 Framework 类型
+ */
+export type { Framework };

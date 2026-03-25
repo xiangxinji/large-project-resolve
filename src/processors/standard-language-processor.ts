@@ -47,9 +47,12 @@ export abstract class StandardLanguageProcessor extends BaseFileProcessor {
     try {
       const captures = this.parserConfig.query.captures(rootNode);
       captures.forEach((capture) => {
-        const depPath = this.cleanDependencyPath(capture.node.text);
-        if (this.isValidDependency(depPath)) {
-          dependencies.add(depPath);
+        // 只处理标记为 @dep 的捕获，忽略其他捕获（如 @attr.name）
+        if (capture.name === 'dep') {
+          const depPath = this.cleanDependencyPath(capture.node.text);
+          if (this.isValidDependency(depPath)) {
+            dependencies.add(depPath);
+          }
         }
       });
     } catch (error) {

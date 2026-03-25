@@ -1,0 +1,26 @@
+{
+  "index.vue": [
+    "./b.vue"
+  ],
+  "c.vue": [],
+  "c.java": [
+    "java.io.File",
+    "java.io.IOException",
+    "java.nio.file.Files",
+    "java.nio.file.Path"
+  ],
+  "b.vue": [
+    "./c.vue"
+  ],
+  "b.java": [
+    "java.util.HashMap",
+    "java.util.Map",
+    "com.example.c.CUtils"
+  ],
+  "a.java": [
+    "java.util.List",
+    "java.util.ArrayList",
+    "com.example.b.BService",
+    "com.example.c.CUtils"
+  ]
+}
